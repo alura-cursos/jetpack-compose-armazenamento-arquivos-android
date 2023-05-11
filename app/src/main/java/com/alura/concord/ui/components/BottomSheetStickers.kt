@@ -19,11 +19,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alura.concord.R
+import com.alura.concord.navigation.getThumbnailById
+import com.alura.concord.navigation.getURIById
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModalBottomSheetSticker(
-    stickerList: MutableList<String> = mutableListOf(),
+    stickerList: MutableList<Long> = mutableListOf(),
     onSelectedSticker: (Uri) -> Unit = {},
     onBack: () -> Unit = {}
 ) {
@@ -49,7 +51,7 @@ fun ModalBottomSheetSticker(
 
 @Composable
 private fun BottomSheetStickers(
-    stickerList: MutableList<String>,
+    stickerList: MutableList<Long>,
     onSelectedSticker: (Uri) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -82,7 +84,7 @@ private fun BottomSheetStickers(
                         .fillMaxSize()
                         .padding(8.dp)
                         .clickable {
-                            onSelectedSticker(Uri.parse(item))
+                            onSelectedSticker(getURIById(item))
                         }
                 ) {
 
@@ -91,7 +93,7 @@ private fun BottomSheetStickers(
                             .size(50.dp)
                             .align(Alignment.Center),
                         contentScale = ContentScale.Inside,
-                        model = item,
+                        model = context.getThumbnailById(item),
                         placeholder = painterResource(R.drawable.image_place_holder),
                         error = painterResource(R.drawable.image_place_holder),
                         contentDescription = null,

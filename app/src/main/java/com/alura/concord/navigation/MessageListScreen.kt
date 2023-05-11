@@ -1,12 +1,16 @@
 package com.alura.concord.navigation
 
 import android.Manifest
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
+import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,7 +23,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.alura.concord.extensions.showLog
 import com.alura.concord.extensions.showMessage
 import com.alura.concord.ui.chat.MessageListViewModel
 import com.alura.concord.ui.chat.MessageScreen
@@ -81,7 +84,7 @@ fun NavGraphBuilder.messageListScreen(
 
                 requestPermissionLauncher.launch(permission)
 
-                val stickerList = mutableStateListOf<String>()
+                val stickerList = mutableStateListOf<Long>()
 
                 getAllImages(context, onLoadImages = { images ->
                     stickerList.addAll(images)
@@ -162,17 +165,15 @@ fun NavGraphBuilder.messageListScreen(
     }
 }
 
-private fun getAllImages(context: Context, onLoadImages: (List<String>) -> Unit) {
-    val images = mutableListOf<String>()
+private fun getAllImages(context: Context, onLoadImages: (List<Long>) -> Unit) {
+    val images = mutableListOf<Long>()
 
     val projection = arrayOf(
-        MediaStore.Images.Media.DISPLAY_NAME,
-        MediaStore.Images.Media.DATA,
+        MediaStore.Images.Media._ID,
     )
-    val selection = "${MediaStore.Images.Media.DATA} LIKE '%/Download/stickers/%' " +
-            "AND ${MediaStore.Images.Media.SIZE} < ?"
-    val selectionArgs = arrayOf("70000")
-    val sortOrder = "${MediaStore.Images.Media.DISPLAY_NAME} DESC"
+    val selection = null
+    val selectionArgs = null
+    val sortOrder = null
 
     context.contentResolver.query(
         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -183,19 +184,41 @@ private fun getAllImages(context: Context, onLoadImages: (List<String>) -> Unit)
     )?.use { cursor ->
 
         while (cursor.moveToNext()) {
-            val nameIndex: Int = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME)
-            val name: String = cursor.getString(nameIndex)
-
-            val pathIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA)
-            val path = cursor.getString(pathIndex)
-
-            context.showLog("Nome: $name e caminho: $path")
-            images.add(path)
+            val idIndex: Int = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+            val imageId: Long = cursor.getLong(idIndex)
+            images.add(imageId)
         }
         onLoadImages(images)
     }
 }
 
+fun getURIById(fileId: Long): Uri {
+    return ContentUris.withAppendedId(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        fileId
+    )
+}
+
+fun Context.getThumbnailById(imageId: Long): Bitmap {
+    val thumbnail: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        contentResolver.loadThumbnail(
+            ContentUris.withAppendedId(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                imageId
+            ),
+            Size(100, 100), // Escolha o tamanho desejado aqui, apenas um exemplo
+            null
+        )
+    } else {
+        MediaStore.Images.Thumbnails.getThumbnail(
+            contentResolver,
+            imageId,
+            MediaStore.Images.Thumbnails.MINI_KIND,
+            null
+        )
+    }
+    return thumbnail
+}
 
 internal fun NavHostController.navigateToMessageScreen(
     chatId: Long,
