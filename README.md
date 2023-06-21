@@ -49,6 +49,9 @@ Após baixar o projeto, você pode abri-lo com o Android Studio. Para isso, na t
 
 ![gif-desafio-github](https://github.com/alura-cursos/jetpack-compose-armazenamento-arquivos-android/assets/35709152/79ae2713-da01-484e-bcb9-8dc7612405c7)
 
+## 📚 Mais informações do curso
+
+Gostou do conteúdo e quer saber mais detalhes? Então [confira o curso na página da Alura](https://www.alura.com.br/curso-online-jetpack-compose-armazenamento-arquivos-android) 😉
 
 [modalbottomsheet-link]: https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#ModalBottomSheet(kotlin.Function0,androidx.compose.ui.Modifier,androidx.compose.material3.SheetState,androidx.compose.ui.graphics.Shape,androidx.compose.ui.graphics.Color,androidx.compose.ui.graphics.Color,androidx.compose.ui.unit.Dp,androidx.compose.ui.graphics.Color,kotlin.Function0,kotlin.Function1)
 [photopicker]: https://developer.android.com/training/data-storage/shared/photopicker
